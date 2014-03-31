@@ -13,10 +13,8 @@ module RedminePluginAssetPipeline
       RedmineApp::Application.configure do
         config.assets.enabled = true
         config.assets.prefix = '' # Redmine save all assets in root of public =(
-        config.assets.css_compressor = :yui
         config.assets.js_compressor = :uglifier
         config.assets.paths << "#{config.root}/public/plugin_assets"
-        config.assets.initialize_on_precompile = false
         
         # TODO: delete environment hardcode
         config.assets.precompile += %w(*/stylesheets/* */javascripts/*)
