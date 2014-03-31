@@ -1,6 +1,6 @@
-require "redmine_asset_pipeline/version"
+require "redmine_plugin_asset_pipeline/version"
 
-module RedmineAssetPipeline
+module RedminePluginAssetPipeline
   # Run the classic redmine plugin initializer after rails boot
   class Plugin < ::Rails::Engine
     config.after_initialize do

@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'redmine_asset_pipeline/version'
+require 'redmine_plugin_asset_pipeline/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "redmine_plugin_asset_pipeline"
-  spec.version       = RedmineAssetPipeline::VERSION
+  spec.version       = RedminePluginAssetPipeline::VERSION
   spec.authors       = ["Tab10id"]
   spec.email         = ["tabloidmeister@gmail.com"]
   spec.description   = %q{Asset pipeline for Redmine}

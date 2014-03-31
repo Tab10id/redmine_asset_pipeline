@@ -1,6 +1,6 @@
 require_dependency 'application_helper'
 
-module RedmineAssetPipeline
+module RedminePluginAssetPipeline
   module ApplicationHelperPatch
     def self.included(base)
       base.send(:include, InstanceMethods)
