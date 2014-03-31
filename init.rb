@@ -1,13 +1,6 @@
 require 'redmine'
 require 'redmine_plugin_asset_pipeline/version'
 
-ActionDispatch::Callbacks.to_prepare do
-  require_dependency 'application_helper'
-  unless ApplicationHelper.included_modules.include? RedminePluginAssetPipeline::ApplicationHelperPatch
-    ApplicationHelper.send(:include, RedminePluginAssetPipeline::ApplicationHelperPatch)
-  end
-end
-
 Redmine::Plugin.register :redmine_plugin_asset_pipeline do
   name 'Redmine Plugin Asset Pipeline plugin'
   description 'This plugin adds asset pipeline support for redmine plugins'
