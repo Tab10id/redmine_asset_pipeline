@@ -4,13 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'redmine_asset_pipeline/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "redmine_asset_pipeline"
+  spec.name          = "redmine_plugin_asset_pipeline"
   spec.version       = RedmineAssetPipeline::VERSION
-  spec.authors       = ["Jean-Baptiste Barth"]
-  spec.email         = ["jeanbaptiste.barth@gmail.com"]
+  spec.authors       = ["Tab10id"]
+  spec.email         = ["tabloidmeister@gmail.com"]
   spec.description   = %q{Asset pipeline for Redmine}
   spec.summary       = %q{Asset pipeline for Redmine}
-  spec.homepage      = "https://github.com/jbbarth/redmine_asset_pipeline"
+  spec.homepage      = "https://github.com/Tab10id/redmine_plugin_asset_pipeline"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
