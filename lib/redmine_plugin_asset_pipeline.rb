@@ -14,13 +14,21 @@ module RedminePluginAssetPipeline
         config.assets.enabled = true
         config.assets.paths << "#{config.root}/private/plugin_assets"
         config.assets.precompile += %w(*/stylesheets/*.css */javascripts/*.js)
-        config.assets.prefix = '' # Redmine save all assets in root of public =(
 
         # Custom settings. Edit configs of your application
         # See: http://guides.rubyonrails.org/asset_pipeline.html
+        #
+        # Redmine save all assets in root of public =(
+        # If you need to change that value
+        # manually move assets in public directory and edit it
+        # config.assets.prefix = ''
+        #
         # config.assets.js_compressor = :uglifier
+        #
         # config.assets.debug = true
+        #
         # config.assets.compile = true
+        #
         # config.assets.compress = false
       end
     end

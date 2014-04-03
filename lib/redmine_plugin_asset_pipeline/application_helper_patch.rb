@@ -3,16 +3,20 @@ module RedminePluginAssetPipeline
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
+        def assets_prefix
+          Rails.application.config.assets.prefix.gsub(/^\//, '')
+        end
+
         def stylesheet_link_tag(*sources)
           options = sources.last.is_a?(Hash) ? sources.pop : {}
           plugin = options.delete(:plugin)
           sources = sources.map do |source|
-            if plugin && plugin != 'application'
-              "/#{plugin}/stylesheets/#{source}"
+            if plugin
+              "/#{[assets_prefix, "#{plugin}/stylesheets/#{source}"].join('/')}"
             elsif current_theme && current_theme.stylesheets.include?(source)
               current_theme.stylesheet_path(source)
             else
-              "/stylesheets/#{source}"
+              "/#{[assets_prefix, "stylesheets/#{source}"].join('/')}"
             end
           end
           super *sources, options
@@ -22,13 +26,22 @@ module RedminePluginAssetPipeline
           options = sources.last.is_a?(Hash) ? sources.pop : {}
           plugin = options.delete(:plugin)
           sources = sources.map do |source|
-            if plugin && plugin != 'application'
-              "/#{plugin}/javascripts/#{source}"
+            if plugin
+              "/#{[assets_prefix, "#{plugin}/javascripts/#{source}"].join('/')}"
             else
-              "/javascripts/#{source}"
+              "/#{[assets_prefix, "javascripts/#{source}"].join('/')}"
             end
           end
           super *sources, options
+        end
+
+        def image_tag(source, options={})
+          if plugin = options.delete(:plugin)
+            source = "/#{[assets_prefix, "#{plugin}/images/#{source}"].join('/')}"
+          elsif current_theme && current_theme.images.include?(source)
+            source = current_theme.image_path(source)
+          end
+          super source, options
         end
       end
     end
