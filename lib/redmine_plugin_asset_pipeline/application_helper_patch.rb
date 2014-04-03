@@ -40,6 +40,8 @@ module RedminePluginAssetPipeline
             source = "/#{[assets_prefix, "#{plugin}/images/#{source}"].join('/')}"
           elsif current_theme && current_theme.images.include?(source)
             source = current_theme.image_path(source)
+          else
+            source = "/#{[assets_prefix, "images/#{source}"].join('/')}"
           end
           super source, options
         end
