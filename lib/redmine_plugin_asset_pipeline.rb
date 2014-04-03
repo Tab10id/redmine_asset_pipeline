@@ -33,11 +33,8 @@ module RedminePluginAssetPipeline
       end
     end
 
-    config.after_initialize do
+    config.to_prepare do
       require_dependency 'redmine_plugin_asset_pipeline/application_helper_patch'
-      unless ApplicationHelper.included_modules.include? RedminePluginAssetPipeline::ApplicationHelperPatch
-        ApplicationHelper.send(:include, RedminePluginAssetPipeline::ApplicationHelperPatch)
-      end
     end
 
   end
