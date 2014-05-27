@@ -28,6 +28,7 @@ module RedminePluginAssetPipeline
       def mirror_assets_to_private
         source = assets_directory
         destination = private_directory
+        FileUtils.rm_rf(destination)
         return unless File.directory?(source)
 
         source_files = Dir[source + "/**/*"]
