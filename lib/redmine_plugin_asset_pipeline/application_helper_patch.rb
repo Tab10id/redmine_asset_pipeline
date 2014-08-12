@@ -17,7 +17,7 @@ module ApplicationHelper
       end
     end
     sources.collect do |source|
-      if debug && asset = asset_paths.asset_for(source, 'css')
+      if debug && asset = asset_for(source, 'css')
         asset.to_a.map { |dep|
           super(dep.pathname.to_s, { :href => asset_path(dep, :ext => 'css', :body => true, :protocol => :request, :digest => digest) }.merge!(options))
         }
@@ -41,7 +41,7 @@ module ApplicationHelper
       end
     end
     sources.collect do |source|
-      if debug && asset = asset_paths.asset_for(source, 'js')
+      if debug && asset = asset_for(source, 'js')
         asset.to_a.map { |dep|
           super(dep.pathname.to_s, { :src => asset_path(dep, :ext => 'js', :body => true, :digest => digest) }.merge!(options))
         }
@@ -111,5 +111,35 @@ module ApplicationHelper
 
   def assets_prefix
     Rails.application.config.assets.prefix.gsub(/^\//, '')
+  end
+
+  def asset_for(source, ext)
+    source = source.to_s
+    return nil if asset_paths.is_uri?(source)
+    source = rewrite_extension(source, ext)
+    Rails.application.assets[source]
+  rescue Sprockets::FileOutsidePaths
+    nil
+  end
+
+  def rewrite_extension(source, ext)
+    source_ext = File.extname(source)[1..-1]
+
+    if !ext || ext == source_ext
+      source
+    elsif source_ext.blank?
+      "#{source}.#{ext}"
+    elsif File.exists?(source) || exact_match_present?(source)
+      source
+    else
+      "#{source}.#{ext}"
+    end
+  end
+
+  def exact_match_present?(source)
+    pathname = Rails.application.assets.resolve(source)
+    pathname.to_s =~ /#{Regexp.escape(source)}\Z/
+  rescue Sprockets::FileNotFound
+    false
   end
 end
