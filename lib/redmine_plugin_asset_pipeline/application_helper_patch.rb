@@ -1,45 +1,63 @@
 require_dependency 'application_helper'
 
 module ApplicationHelper
-  def assets_prefix
-    Rails.application.config.assets.prefix.gsub(/^\//, '')
-  end
-
   def stylesheet_link_tag(*sources)
-    options = sources.last.is_a?(Hash) ? sources.pop : {}
+    options = sources.extract_options!
     plugin = options.delete(:plugin)
-    sources = sources.map do |source|
+    debug   = options.key?(:debug) ? options.delete(:debug) : debug_assets?
+    body    = options.key?(:body)  ? options.delete(:body)  : false
+    digest  = options.key?(:digest)  ? options.delete(:digest)  : digest_assets?
+    sources.map! do |source|
       if plugin
-        "/#{[assets_prefix, "#{plugin}/stylesheets/#{source}"].join('/')}"
+        "#{plugin}/stylesheets/#{source}"
       elsif current_theme && current_theme.stylesheets.include?(source)
         current_theme.stylesheet_path(source)
       else
-        "/#{[assets_prefix, "stylesheets/#{source}"].join('/')}"
+        "stylesheets/#{source}"
       end
     end
-    super *sources, options
+    sources.collect do |source|
+      if debug && asset = asset_paths.asset_for(source, 'css')
+        asset.to_a.map { |dep|
+          super(dep.pathname.to_s, { :href => asset_path(dep, :ext => 'css', :body => true, :protocol => :request, :digest => digest) }.merge!(options))
+        }
+      else
+        super(source.to_s, { :href => asset_path(source, :ext => 'css', :body => body, :protocol => :request, :digest => digest) }.merge!(options))
+      end
+    end.flatten.uniq.join("\n").html_safe
   end
 
   def javascript_include_tag(*sources)
     options = sources.last.is_a?(Hash) ? sources.pop : {}
     plugin = options.delete(:plugin)
-    sources = sources.map do |source|
+    debug   = options.key?(:debug) ? options.delete(:debug) : debug_assets?
+    body    = options.key?(:body)  ? options.delete(:body)  : false
+    digest  = options.key?(:digest)  ? options.delete(:digest)  : digest_assets?
+    sources.map! do |source|
       if plugin
-        "/#{[assets_prefix, "#{plugin}/javascripts/#{source}"].join('/')}"
+        "#{plugin}/javascripts/#{source}"
       else
-        "/#{[assets_prefix, "javascripts/#{source}"].join('/')}"
+        "javascripts/#{source}"
       end
     end
-    super *sources, options
+    sources.collect do |source|
+      if debug && asset = asset_paths.asset_for(source, 'js')
+        asset.to_a.map { |dep|
+          super(dep.pathname.to_s, { :src => asset_path(dep, :ext => 'js', :body => true, :digest => digest) }.merge!(options))
+        }
+      else
+        super(source.to_s, { :src => asset_path(source, :ext => 'js', :body => body, :digest => digest) }.merge!(options))
+      end
+    end.flatten.uniq.join("\n").html_safe
   end
 
   def image_tag(source, options={})
     if plugin = options.delete(:plugin)
-      source = "/#{[assets_prefix, "#{plugin}/images/#{source}"].join('/')}"
+      source = "#{plugin}/images/#{source}"
     elsif current_theme && current_theme.images.include?(source)
       source = current_theme.image_path(source)
     elsif source[0] != '/'
-      source = "/#{[assets_prefix, "images/#{source}"].join('/')}"
+      source = "images/#{source}"
     end
     super source, options
   end
@@ -66,5 +84,32 @@ module ApplicationHelper
         tags
       end
     end
+  end
+
+  private
+
+  # copy-paste from Sprocket
+  def debug_assets?
+    compile_assets? && (Rails.application.config.assets.debug || params[:debug_assets])
+  rescue NameError
+    false
+  end
+
+  def compile_assets?
+    Rails.application.config.assets.compile
+  end
+
+  def digest_assets?
+    Rails.application.config.assets.digest
+  end
+
+  def asset_path(source, options = {})
+    source = source.logical_path if source.respond_to?(:logical_path)
+    path = asset_paths.compute_public_path(source, assets_prefix, options.merge(:body => true))
+    options[:body] ? "#{path}?body=1" : path
+  end
+
+  def assets_prefix
+    Rails.application.config.assets.prefix.gsub(/^\//, '')
   end
 end
