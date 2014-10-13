@@ -9,12 +9,10 @@ module RedminePluginAssetPipeline
 
     #asset pipeline configuration
     #enable asset pipeline before sprockets boots
-    initializer 'redmine.asset_pipeline', :before => 'sprockets.environment' do
+    initializer 'redmine.asset_pipeline', before: 'sprockets.environment' do
       RedmineApp::Application.configure do
-        config.assets.enabled = true
         config.assets.paths << "#{config.root}/private/plugin_assets"
         config.assets.precompile += %w(*/stylesheets/*.css */javascripts/*.js)
-
         # Custom settings. Edit configs of your application
         # See: http://guides.rubyonrails.org/asset_pipeline.html
         #
@@ -22,14 +20,6 @@ module RedminePluginAssetPipeline
         # If you need to change that value
         # manually move assets in public directory and edit it
         # config.assets.prefix = ''
-        #
-        # config.assets.js_compressor = :uglifier
-        #
-        # config.assets.debug = true
-        #
-        # config.assets.compile = true
-        #
-        # config.assets.compress = false
       end
     end
 
