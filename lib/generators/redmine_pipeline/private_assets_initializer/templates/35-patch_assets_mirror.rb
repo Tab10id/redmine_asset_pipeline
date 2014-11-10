@@ -4,3 +4,9 @@ Rails.configuration.before_configuration do
     Redmine::Plugin.send(:include, RedminePluginAssetPipeline::PluginPatch)
   end
 end
+
+RedminePluginAssetPipeline.configure do |config|
+  if Rails.env.development?
+    config.use_ln = true
+  end
+end
