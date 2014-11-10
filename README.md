@@ -37,7 +37,7 @@ This plugin is only compatible with Redmine 2.1.0+. It is distributed as a ruby 
 
 Add this line to your redmine's Gemfile.local:
 
-    gem 'redmine_asset_pipeline'
+    gem 'redmine_plugin_asset_pipeline'
 
 And then execute:
 

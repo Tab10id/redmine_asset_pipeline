@@ -19,20 +19,10 @@ module RedminePluginAssetPipeline
     # end
 
     def process_require_redmine_plugins_directive(type)
-
       mask = Rails.root.join(Redmine::Plugin.private_directory,  "*/#{type}/_common_part*").expand_path
-
-      Dir.glob(mask).sort.each do |dir|
-        require_absolute_tree(dir)
+      Dir.glob(mask).sort.each do |entry|
+        context.require_asset(pathname.dirname.join(entry).expand_path)
       end
-    end
-
-    # Same code as "process_require_tree_directive(path)", without
-    # any check of relativity of path
-    #
-    # TODO: maybe some refactoring
-    def require_absolute_tree(directory)
-      context.require_asset(pathname.dirname.join(directory).expand_path)
     end
   end
 end
