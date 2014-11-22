@@ -3,52 +3,80 @@ require_dependency 'application_helper'
 module ApplicationHelper
   def stylesheet_link_tag(*sources)
     options = sources.extract_options!
-    plugin = options.delete(:plugin)
+    plugin  = options.delete(:plugin)
     debug   = options.key?(:debug) ? options.delete(:debug) : debug_assets?
-    body    = options.key?(:body)  ? options.delete(:body)  : false
-    digest  = options.key?(:digest)  ? options.delete(:digest)  : digest_assets?
+    body    = options.key?(:body) ? options.delete(:body) : false
+    digest  = options.key?(:digest) ? options.delete(:digest) : digest_assets?
     sources.map! do |source|
       if plugin
         "#{plugin}/stylesheets/#{source}"
       elsif current_theme && current_theme.stylesheets.include?(source)
         current_theme.stylesheet_path(source)
       else
-        "stylesheets/#{source}"
+        # NOTE: bugfix aka crutck for asset from gem
+        ["stylesheets/#{source}", source]
       end
     end
+    source.flatten!
     sources.collect do |source|
-      if debug && asset = asset_for(source, 'css')
-        asset.to_a.map { |dep|
-          super(dep.pathname.to_s, { href: asset_path(dep, ext: 'css', body: true, protocol: :request, digest: digest) }.merge!(options))
-        }
+      asset = asset_for(source, 'css')
+      if debug && asset
+        asset.to_a.map do |dep|
+          single_asset_path = asset_path(dep, ext: 'css',
+                                              body: true,
+                                              protocol: :request,
+                                              digest: digest)
+          # TODO: here we must try to make more pretty solution
+          next if single_asset_path.blank?
+          super(dep.pathname.to_s, { href: single_asset_path }.merge!(options))
+        end
       else
-        super(source.to_s, { href: asset_path(source, ext: 'css', body: body, protocol: :request, digest: digest) }.merge!(options))
+        single_asset_path = asset_path(source, ext: 'css',
+                                               body: body,
+                                               protocol: :request,
+                                               digest: digest)
+        # TODO: here we must try to make more pretty solution
+        next if single_asset_path.blank?
+        super(source.to_s, { href: single_asset_path }.merge!(options))
       end
-    end.flatten.uniq.join("\n").html_safe
+    end.flatten.compact.uniq.join("\n").html_safe
   end
 
   def javascript_include_tag(*sources)
     options = sources.last.is_a?(Hash) ? sources.pop : {}
-    plugin = options.delete(:plugin)
+    plugin  = options.delete(:plugin)
     debug   = options.key?(:debug) ? options.delete(:debug) : debug_assets?
-    body    = options.key?(:body)  ? options.delete(:body)  : false
-    digest  = options.key?(:digest)  ? options.delete(:digest)  : digest_assets?
+    body    = options.key?(:body) ? options.delete(:body) : false
+    digest  = options.key?(:digest) ? options.delete(:digest) : digest_assets?
     sources.map! do |source|
       if plugin
         "#{plugin}/javascripts/#{source}"
       else
-        "javascripts/#{source}"
+        # NOTE: bugfix aka crutck for asset from gem
+        ["javascripts/#{source}", source]
       end
     end
+    source.flatten!
     sources.collect do |source|
-      if debug && asset = asset_for(source, 'js')
-        asset.to_a.map { |dep|
-          super(dep.pathname.to_s, { src: asset_path(dep, ext: 'js', body: true, digest: digest) }.merge!(options))
-        }
+      asset = asset_for(source, 'js')
+      if debug && asset
+        asset.to_a.map do |dep|
+          single_asset_path = asset_path(dep, ext: 'js',
+                                              body: true,
+                                              digest: digest)
+          # TODO: here we must try to make more pretty solution
+          next if single_asset_path.blank?
+          super(dep.pathname.to_s, { src: single_asset_path }.merge!(options))
+        end
       else
-        super(source.to_s, { src: asset_path(source, ext: 'js', body: body, digest: digest) }.merge!(options))
+        single_asset_path = asset_path(source, ext: 'js',
+                                               body: body,
+                                               digest: digest)
+        # TODO: here we must try to make more pretty solution
+        next if single_asset_path.blank?
+        super(source.to_s, { src: single_asset_path }.merge!(options))
       end
-    end.flatten.uniq.join("\n").html_safe
+    end.flatten.compact.uniq.join("\n").html_safe
   end
 
   def image_tag(source, options={})
