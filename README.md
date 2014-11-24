@@ -1,7 +1,7 @@
-Redmine Asset Pipeline plugin
+Redmine Plugin Asset Pipeline plugin
 =============================
 
-This plugin adds asset pipeline awesomeness to Redmine and Redmine plugins.
+This plugin adds asset pipeline features to Redmine and Redmine plugins.
 
 For who ?
 ---------
@@ -9,39 +9,51 @@ This plugin only targets plugin developers. You shouldn't try to install this wi
 
 Why ?
 -----
-By default, Redmine made the deliberate (and wise) choice to disable the asset pipeline for core development. Enabling the asset pipeline by default would bring a thousand questions for people who are not in Rails and have a deep understanding of how it works. See [some of my thoughs about this here](http://www.redmine.org/issues/11445#note-9).
+By default, Redmine not support asset pipeline feature (many rewrites of standard rails functionality).
 
-Having the asset pipeline enabled would be interesting though if you have a lot of plugins, which is my case. The average page on my biggest Redmine instance downloads ~50 js/css individual files, which is a big waste in terms of performance and bandwith. I'd really like them to be minified and bundled into one application.js and one application.css.
+Having the asset pipeline enabled would be interesting though if you have a lot of plugins or when you want to have possibility for normal usage different preprocessors like sass, less, CoffeeScript.
 
 How ?
 -----
-The plugin reconfigures asset-related options in the main app.
+The plugin try to restore normal pipeline functionality in Redmine and add some features for comfortable Redmine plugins development.
 
 Features of this plugin
 -----------------------
-* serve main app assets with the asset pipeline : disabled
-* serve plugin assets with the asset pipeline : disabled for standard plugins ; enabled for redmine gems
-* minify assets in the pipeline : disabled
-* concatenate all plugin assets into one js + one css : ok for redmine gems
-* concatenate core resources with the ones of plugins : abandonned (useless)
-* compile coffeescript/sass/etc. : not tested yet
+* serve main app assets with the asset pipeline
+* serve plugin assets with the asset pipeline
+* ability for concatenate .css and .js assets in one file
+* minify assets in the pipeline
+* support digest option of asset pipeline config
 
 Known problems
 --------------
-* for now it seems that all_plugins.js loads everything already loaded in all_core.js, resulting in unecessary wasted bandwith.
+* Redmine themes are not processed through the pipeline
+* Plugin code a little ugly
 
 Installation
 ------------
 
 This plugin is only compatible with Redmine 2.1.0+. It is distributed as a ruby gem.
 
-Add this line to your redmine's Gemfile.local:
+Add this line to your redmine's Gemfile:
 
     gem 'redmine_plugin_asset_pipeline'
 
 And then execute:
 
     $ bundle install
+
+Configure assets in your application (core Redmine config/application.rb)
+Unfortunately you can't configure pipeline in gem or in redmine plugin, many gems may work wrong if pipeline functionality enabled not in application (order of gem load)
+
+You can set config.assets.paths to public directory of Redmine but that can provoke some problems with preprocessors (if you precompile assets).
+Also problems may occur if you leave standard Redmine assets in root of public (possible conflict with rails routes).
+We recommend you to:
+* Move redmine assets to directory 'private/assets' (simple create it in root of redmine).
+* Run 'rails generate ?????' (that create initializer 35-patch_assets_mirror, that patch Plugin class of redmine for copy plugin assets to private directory).
+* But that file shouldn't work well without modify of standard redmine initializer. Move all started from line: "Redmine::Plugin.load" in 30-redmine.rb to new initializer after 35-patch_assets_mirror.
+* Change config.assets.prefix to something.
+* Fix standard Redmine .css files (some paths in css hardcoded to the public root).
 
 Then restart your Redmine instance.
 
