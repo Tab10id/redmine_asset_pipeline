@@ -13,17 +13,13 @@ module ApplicationHelper
       elsif current_theme && current_theme.stylesheets.include?(source)
         current_theme.stylesheet_path(source)
       else
-        # NOTE: bugfix aka crutck for asset from gem
-        ["stylesheets/#{source}", source]
+        # NOTE: bugfix aka crutch for asset from gem
+        ["stylesheets/#{source}", source].
+            find{|s| asset_for(s, 'css').present?} || "stylesheets/#{source}"
       end
     end
     sources.collect do |source|
-      if source.is_a?(Array)
-        asset = source.collect{|s| asset_for(s, 'css')}.compact
-        asset = asset.any? ? asset.first : source.first
-      else
-        asset = asset_for(source, 'css')
-      end
+      asset = asset_for(source, 'css')
       if debug && asset
         asset.to_a.map do |dep|
           single_asset_path = asset_path(dep, ext: 'css',
@@ -43,7 +39,7 @@ module ApplicationHelper
         next if single_asset_path.blank?
         super(source.to_s, { href: single_asset_path }.merge!(options))
       end
-    end.flatten.compact.uniq.join("\n").html_safe
+    end.compact.uniq.join("\n").html_safe
   end
 
   def javascript_include_tag(*sources)
@@ -56,17 +52,13 @@ module ApplicationHelper
       if plugin
         "#{plugin}/javascripts/#{source}"
       else
-        # NOTE: bugfix aka crutck for asset from gem
-        ["javascripts/#{source}", source]
+        # NOTE: bugfix aka crutch for asset from gem
+        ["javascripts/#{source}", source].
+            find{|s| asset_for(s, 'js').present?} || "javascripts/#{source}"
       end
     end
     sources.collect do |source|
-      if source.is_a?(Array)
-        asset = source.collect{|s| asset_for(s, 'js')}.compact
-        asset = asset.any? ? asset.first : source.first
-      else
-        asset = asset_for(source, 'js')
-      end
+      asset = asset_for(source, 'js')
       if debug && asset
         asset.to_a.map do |dep|
           single_asset_path = asset_path(dep, ext: 'js',
@@ -84,7 +76,7 @@ module ApplicationHelper
         next if single_asset_path.blank?
         super(source.to_s, { src: single_asset_path }.merge!(options))
       end
-    end.flatten.compact.uniq.join("\n").html_safe
+    end.compact.uniq.join("\n").html_safe
   end
 
   def image_tag(source, options={})
