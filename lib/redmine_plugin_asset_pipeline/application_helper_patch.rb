@@ -17,9 +17,13 @@ module ApplicationHelper
         ["stylesheets/#{source}", source]
       end
     end
-    source.flatten!
     sources.collect do |source|
-      asset = asset_for(source, 'css')
+      if source.is_a?(Array)
+        asset = source.collect{|s| asset_for(s, 'css')}.compact
+        asset = asset.any? ? asset.first : source.first
+      else
+        asset = asset_for(source, 'css')
+      end
       if debug && asset
         asset.to_a.map do |dep|
           single_asset_path = asset_path(dep, ext: 'css',
@@ -29,7 +33,7 @@ module ApplicationHelper
           # TODO: here we must try to make more pretty solution
           next if single_asset_path.blank?
           super(dep.pathname.to_s, { href: single_asset_path }.merge!(options))
-        end
+        end.compact
       else
         single_asset_path = asset_path(source, ext: 'css',
                                                body: body,
@@ -56,9 +60,13 @@ module ApplicationHelper
         ["javascripts/#{source}", source]
       end
     end
-    source.flatten!
     sources.collect do |source|
-      asset = asset_for(source, 'js')
+      if source.is_a?(Array)
+        asset = source.collect{|s| asset_for(s, 'js')}.compact
+        asset = asset.any? ? asset.first : source.first
+      else
+        asset = asset_for(source, 'js')
+      end
       if debug && asset
         asset.to_a.map do |dep|
           single_asset_path = asset_path(dep, ext: 'js',
@@ -67,7 +75,7 @@ module ApplicationHelper
           # TODO: here we must try to make more pretty solution
           next if single_asset_path.blank?
           super(dep.pathname.to_s, { src: single_asset_path }.merge!(options))
-        end
+        end.compact
       else
         single_asset_path = asset_path(source, ext: 'js',
                                                body: body,
