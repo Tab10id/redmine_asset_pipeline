@@ -24,6 +24,7 @@ Features of this plugin
 * ability for concatenate .css and .js assets in one file
 * minify assets in the pipeline
 * support digest option of asset pipeline config
+* in development environment you have assets src directory than have symlinks to the plugin directories, so you don't need run redmine:plugins:assets or restart server every time when you edit asset in your plugin
 
 Known problems
 --------------
