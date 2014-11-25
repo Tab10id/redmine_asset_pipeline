@@ -22,7 +22,7 @@ Features of this plugin
 * serve main app assets with the asset pipeline
 * serve plugin assets with the asset pipeline
 * ability for concatenate .css and .js assets in one file (just create _common_application.(js/css) in your plugin and use sprocket directives in those files, than create aggregating css/js in on of your plugin and use sprocket directive require_redmine_plugins on it)
-e.g. @//= require_redmine_plugins javascripts@ for js
+e.g. `//= require_redmine_plugins javascripts` for js
 * minify assets in the pipeline
 * support digest option of asset pipeline config
 * in development environment you have assets src directory than have symlinks to the plugin directories, so you don't need run redmine:plugins:assets or restart server every time when you edit asset in your plugin
