@@ -25,7 +25,7 @@ Features of this plugin
 e.g. `//= require_redmine_plugins javascripts` for js
 * minify assets in the pipeline
 * support digest option of asset pipeline config
-* in development environment you have assets src directory than have symlinks to the plugin directories, so you don't need run redmine:plugins:assets or restart server every time when you edit asset in your plugin
+* in development environment you have assets src directory than have symlinks to the plugin directories, so you don't need run `redmine:plugins:assets` or restart server every time when you edit asset in your plugin
 
 Known problems
 --------------
@@ -52,7 +52,7 @@ You can set config.assets.paths to public directory of Redmine but that can prov
 Also problems may occur if you leave standard Redmine assets in root of public (possible conflict with rails routes).
 We recommend you to:
 * Move redmine assets to directory 'private/assets' (simple create it in root of redmine).
-* Run 'rails generate ?????' (that create initializer 35-patch_assets_mirror, that patch Plugin class of redmine for copy plugin assets to private directory).
+* Run `rails generate redmine_pipeline:private_assets_initializer` (that create initializer 35-patch_assets_mirror, that patch Plugin class of redmine for copy plugin assets to private directory).
 * But that file shouldn't work well without modify of standard redmine initializer. Move all started from line: "Redmine::Plugin.load" in 30-redmine.rb to new initializer after 35-patch_assets_mirror.
 * Change config.assets.prefix to something.
 * Fix standard Redmine .css files (some paths in css hardcoded to the public root).
