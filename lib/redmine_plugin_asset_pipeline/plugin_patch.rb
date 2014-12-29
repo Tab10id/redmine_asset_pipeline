@@ -28,13 +28,20 @@ module RedminePluginAssetPipeline
       def mirror_assets_to_private
         source = assets_directory
         destination = private_directory
+
+        unless File.exist?(self.class.private_directory)
+          FileUtils.mkdir_p(self.class.private_directory)
+        end
+
         if File.exist?(destination)
           FileUtils.rm_rf(destination)
         end
         return unless File.directory?(source)
 
         if RedminePluginAssetPipeline.config.use_ln
-          FileUtils.ln_s(source, destination)
+          if File.exist?(source)
+            FileUtils.ln_s(source, destination)
+          end
         else
           source_files = Dir[source + "/**/*"]
           source_dirs = source_files.select { |d| File.directory?(d) }
