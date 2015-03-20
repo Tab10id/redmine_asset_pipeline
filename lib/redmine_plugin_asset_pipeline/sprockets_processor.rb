@@ -18,8 +18,8 @@ module RedminePluginAssetPipeline
     #  end
     # end
 
-    def process_require_redmine_plugins_directive(type)
-      mask = Rails.root.join(Redmine::Plugin.private_directory,  "*/#{type}/_common_part*").expand_path
+    def process_require_redmine_plugins_directive(type, prefix='')
+      mask = Rails.root.join(Redmine::Plugin.private_directory,  "*/#{type}/#{prefix}_common_part*").expand_path
       Dir.glob(mask).sort.each do |entry|
         context.require_asset(pathname.dirname.join(entry).expand_path)
       end
