@@ -34,7 +34,7 @@ module RedminePluginAssetPipeline::Infectors::Redmine::Plugin
         FileUtils.ln_s(source, destination)
       end
     else
-      source_files = Dir[source + "/**/*"]
+      source_files = Dir[source + '/**/*']
       source_dirs = source_files.select { |d| File.directory?(d) }
       source_files -= source_dirs
       unless source_files.empty?
