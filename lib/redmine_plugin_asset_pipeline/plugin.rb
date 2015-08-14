@@ -40,6 +40,9 @@ class RedminePluginAssetPipeline::Plugin < ::Rails::Engine
   end
 
   config.to_prepare do
-    require_dependency 'redmine_plugin_asset_pipeline/application_helper_patch'
+    require_dependency 'application_helper'
+    unless ApplicationHelper.included_modules.include? RedminePluginAssetPipeline::Infectors::ApplicationHelper
+      ApplicationHelper.send(:include, RedminePluginAssetPipeline::Infectors::ApplicationHelper)
+    end
   end
 end

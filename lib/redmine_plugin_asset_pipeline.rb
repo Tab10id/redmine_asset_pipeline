@@ -5,6 +5,7 @@ module RedminePluginAssetPipeline
   extend ActiveSupport::Autoload
   autoload :Configuration
   autoload :Infectors
+  autoload :Rails
 
   def self.configure
     self.config ||= Configuration.new
