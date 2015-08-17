@@ -17,7 +17,7 @@ module RedminePluginAssetPipeline::Infectors::ApplicationHelper
           end || source
         end
       end
-      super *sources, options
+      sprockets_helper_context.stylesheet_link_tag(*sources, options)
     end
 
     def javascript_include_tag(*sources)
@@ -33,7 +33,7 @@ module RedminePluginAssetPipeline::Infectors::ApplicationHelper
           end || source
         end
       end
-      super *sources, options
+      sprockets_helper_context.javascript_include_tag(*sources, options)
     end
 
     def image_tag(source, options={})
@@ -45,7 +45,7 @@ module RedminePluginAssetPipeline::Infectors::ApplicationHelper
       else
         source = [source, "images/#{source}"].find{ |s| asset_digest_path(s).present? } || source
       end
-      super source, options
+      sprockets_helper_context.image_tag(source, options)
     end
 
     # Only one fix - remove leading slash in path_to_image
@@ -73,6 +73,27 @@ module RedminePluginAssetPipeline::Infectors::ApplicationHelper
           tags
         end
       end
+    end
+
+    def sprockets_helper_context
+      @context ||= Class.new do
+        include Sprockets::Rails::Helper
+        # Copy relevant config to AV context
+        app = Rails.application
+        config = app.config
+        self.debug_assets  = config.assets.debug
+        self.digest_assets = config.assets.digest
+        self.assets_prefix = config.assets.prefix
+
+        # Copy over to Sprockets as well
+        context = app.assets.context_class
+        context.assets_prefix = config.assets.prefix
+        context.digest_assets = config.assets.digest
+        context.config        = config.action_controller
+
+        self.assets_environment = app.assets if config.assets.compile
+        self.assets_manifest = app.assets_manifest
+      end.new
     end
   end
 end
