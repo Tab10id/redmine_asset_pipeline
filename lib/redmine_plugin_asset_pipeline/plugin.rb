@@ -8,7 +8,7 @@ class RedminePluginAssetPipeline::Plugin < ::Rails::Engine
   initializer 'redmine.asset_pipeline', before: 'sprockets.environment' do
     RedmineApp::Application.configure do
       config.assets.paths << "#{config.root}/private/plugin_assets"
-      config.assets.precompile += %w(*/stylesheets/*.css */javascripts/*.js */images/*)
+      config.assets.precompile += %w(*/stylesheets/*.css */javascripts/*.js */images/* */fonts/*)
       # Custom settings. Edit configs of your application
       # See: http://guides.rubyonrails.org/asset_pipeline.html
       #
