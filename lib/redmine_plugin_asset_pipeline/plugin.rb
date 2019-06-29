@@ -32,7 +32,7 @@ class RedminePluginAssetPipeline::Plugin < ::Rails::Engine
   # Register our processor (subclass of the standard one which adds a directive for redmine plugins)
   initializer 'redmine.sprockets_processor', after: 'sprockets.environment' do
     require 'redmine_plugin_asset_pipeline/sprockets_processor'
-    env = RedmineApp::Application.assets
+    env = RedmineApp::Application.config.assets
     env.unregister_preprocessor('text/css', Sprockets::DirectiveProcessor)
     env.unregister_preprocessor('application/javascript', Sprockets::DirectiveProcessor)
     env.register_preprocessor('text/css', RedminePluginAssetPipeline::SprocketsProcessor)
