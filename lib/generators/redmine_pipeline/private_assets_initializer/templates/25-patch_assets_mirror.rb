@@ -10,3 +10,11 @@ RedminePluginAssetPipeline.configure do |config|
     config.use_ln = true
   end
 end
+
+module ActionView
+  module Helpers
+    module AssetUrlHelper
+      alias path_to_asset original_path_to_asset
+    end
+  end
+end

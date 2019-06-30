@@ -66,13 +66,9 @@ conflicts with rails routes).
 Our recommendations:
 
 * Move redmine assets to directory `private/assets` (simple create it in root of Redmine)
-* Run `rails generate redmine_pipeline:private_assets_initializer` (that create initializer
-  `35-patch_assets_mirror`, that patch Plugin class of Redmine for copy plugin assets to
-  private directory)
-* Unfortunately file from previous step shouldn't work well without modification of standard
-  Redmine initializer. For fix it move all lines started on: `Redmine::Plugin.load` from `30-redmine.rb`
-  to new initializer goes after `35-patch_assets_mirror`. For example `36-redmine_plugin_init`
-* Set `config.assets.prefix` to avoid a potential conflicts
+* Run `rails generate redmine_pipeline:private_assets_initializer` (that create initializers
+  `09-unpatch-10-patches` and `25-patch_assets_mirror`, that patch Plugin class of Redmine for copy plugin assets to
+  private directory and cancel redmine patch that broke sprockets)
 * Fix standard Redmine \*.css files (some paths in css hardcoded to the public root)
 
 Then restart your Redmine instance.
