@@ -81,18 +81,21 @@ module RedminePluginAssetPipeline::Infectors::ApplicationHelper
         # Copy relevant config to AV context
         app = Rails.application
         config = app.config
-        self.debug_assets  = config.assets.debug
-        self.digest_assets = config.assets.digest
-        self.assets_prefix = config.assets.prefix
 
-        # Copy over to Sprockets as well
-        context = app.assets.context_class
-        context.assets_prefix = config.assets.prefix
-        context.digest_assets = config.assets.digest
-        context.config        = config.action_controller
+        self.debug_assets      = config.assets.debug
+        self.digest_assets     = config.assets.digest
+        self.assets_prefix     = config.assets.prefix
+        self.assets_precompile = config.assets.precompile
 
-        self.assets_environment = app.assets if config.assets.compile
+        self.assets_environment = app.assets
         self.assets_manifest = app.assets_manifest
+
+        self.resolve_assets_with = config.assets.resolve_with
+
+        self.check_precompiled_asset = config.assets.check_precompiled_asset
+        self.unknown_asset_fallback  = config.assets.unknown_asset_fallback
+        # Expose the app precompiled asset check to the view
+        self.precompiled_asset_checker = -> logical_path { app.asset_precompiled? logical_path }
       end.new
     end
   end
