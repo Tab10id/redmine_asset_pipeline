@@ -1,49 +1,63 @@
-class RedminePluginAssetPipeline::Plugin < ::Rails::Engine
-  config.after_initialize do
-    require File.expand_path('../../../init', __FILE__)
-  end
+# frozen_string_literal: true
 
-  #asset pipeline configuration
-  #enable asset pipeline before sprockets boots
-  initializer 'redmine.asset_pipeline', before: 'sprockets.environment' do
-    RedmineApp::Application.configure do
-      config.assets.paths << "#{config.root}/private/plugin_assets"
-      config.assets.precompile += %w(*/stylesheets/*.css */javascripts/*.js */images/* */fonts/*)
-      # Custom settings. Edit configs of your application
-      # See: http://guides.rubyonrails.org/asset_pipeline.html
-      #
-      # Redmine save all assets in root of public =(
-      # If you need to change that value
-      # manually move assets in public directory and edit it
-      # config.assets.prefix = ''
+require 'redmine_plugin_asset_pipeline/sprockets_processor'
+
+module RedminePluginAssetPipeline
+  # Initialize Sprockets
+  # Register `require_redmine_plugins` directives
+  # MonkeyPatching of `ApplicationHelper`
+  class Plugin < ::Rails::Engine
+    # asset pipeline configuration
+    # enable asset pipeline before sprockets boots
+    initializer 'redmine.asset_pipeline', before: 'sprockets.environment' do
+      RedmineApp::Application.configure do
+        config.assets.paths << "#{config.root}/private/plugin_assets"
+        config.assets.precompile +=
+          %w[*/stylesheets/*.css */javascripts/*.js */images/* */fonts/*]
+      end
     end
-  end
 
-  #add all plugin directories in case some js/css/images are included directly or via relative css
-  #it also avoids Sprocket's FileOutsidePaths errors
-  # config.assets.paths += Dir.glob("#{config.root}/plugins/*/assets")
-  #add our directory
-  # config.assets.paths += Dir.glob("#{File.dirname(__FILE__)}/assets")
-  #compression
-  # config.assets.compress = true
-  # config.assets.css_compressor = :yui
-  # config.assets.js_compressor = :yui
-
-  # Register our processor (subclass of the standard one which adds a directive for redmine plugins)
-  initializer 'redmine.sprockets_processor', after: 'sprockets.environment' do
-    require 'redmine_plugin_asset_pipeline/sprockets_processor'
-    RedmineApp::Application.config.assets.configure do |env|
-      env.unregister_preprocessor('text/css', Sprockets::DirectiveProcessor)
-      env.unregister_preprocessor('application/javascript', Sprockets::DirectiveProcessor)
-      env.register_preprocessor('text/css', RedminePluginAssetPipeline::SprocketsProcessor)
-      env.register_preprocessor('application/javascript', RedminePluginAssetPipeline::SprocketsProcessor)
+    # Register our processor
+    # (subclass of the standard one which adds a directive for redmine plugins)
+    initializer 'redmine.sprockets_processor', after: 'sprockets.environment' do
+      RedmineApp::Application.config.assets.configure do |env|
+        env.unregister_preprocessor(
+          'text/css',
+          Sprockets::DirectiveProcessor
+        )
+        env.register_preprocessor(
+          'text/css',
+          RedminePluginAssetPipeline::SprocketsProcessor
+        )
+        env.unregister_preprocessor(
+          'application/javascript',
+          Sprockets::DirectiveProcessor
+        )
+        env.register_preprocessor(
+          'application/javascript',
+          RedminePluginAssetPipeline::SprocketsProcessor
+        )
+      end
     end
-  end
 
-  config.to_prepare do
-    require_dependency 'application_helper'
-    unless ApplicationHelper.included_modules.include? RedminePluginAssetPipeline::Infectors::ApplicationHelper
-      ApplicationHelper.send(:include, RedminePluginAssetPipeline::Infectors::ApplicationHelper)
+    config.to_prepare do
+      require_dependency 'application_helper'
+
+      patch = RedminePluginAssetPipeline::Infectors::ApplicationHelper
+
+      unless ApplicationHelper.included_modules.include?(patch)
+        ApplicationHelper.include(patch)
+      end
+    end
+
+    config.before_configuration do
+      require_dependency 'redmine/plugin'
+
+      patch = RedminePluginAssetPipeline::Infectors::Redmine::Plugin
+
+      unless Redmine::Plugin.included_modules.include?(patch)
+        Redmine::Plugin.include(patch)
+      end
     end
   end
 end

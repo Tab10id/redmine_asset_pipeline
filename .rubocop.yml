@@ -1,0 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.6
+
+Naming/FileName:
+  Exclude:
+    - 'lib/generators/redmine_plugin_asset_pipeline/private_assets_initializer/templates/**'

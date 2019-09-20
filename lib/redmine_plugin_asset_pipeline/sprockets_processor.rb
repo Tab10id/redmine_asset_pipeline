@@ -1,4 +1,6 @@
-class RedminePluginAssetPipeline::SprocketsProcessor < Sprockets::DirectiveProcessor
+# frozen_string_literal: true
+
+module RedminePluginAssetPipeline
   # This processor subclasses the standard Sprockets::DirectiveProcessor
   # as advised in Sprockets, to add a new directive called
   # "require_redmine_plugins". This directive is relative to the
@@ -16,11 +18,16 @@ class RedminePluginAssetPipeline::SprocketsProcessor < Sprockets::DirectiveProce
   #    require(filename)
   #  end
   # end
-
-  def process_require_redmine_plugins_directive(type, prefix='')
-    mask = Rails.root.join(Redmine::Plugin.private_directory_base,  "*/#{type}/#{prefix}_common_part*").expand_path
-    Dir.glob(mask).sort.each do |entry|
-      context.require_asset(pathname.dirname.join(entry).expand_path)
+  class SprocketsProcessor < Sprockets::DirectiveProcessor
+    def process_require_redmine_plugins_directive(type, prefix = '')
+      mask =
+        Rails.root.join(
+          Redmine::Plugin.private_directory_base,
+          "*/#{type}/#{prefix}_common_part*"
+        ).expand_path
+      Dir.glob(mask).sort.each do |entry|
+        context.require_asset(pathname.dirname.join(entry).expand_path)
+      end
     end
   end
 end

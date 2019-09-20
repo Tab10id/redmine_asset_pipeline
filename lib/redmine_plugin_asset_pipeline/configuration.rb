@@ -1,11 +1,14 @@
-class RedminePluginAssetPipeline::Configuration
-  attr_accessor :use_ln
+# frozen_string_literal: true
 
-  def initialize
-    @use_ln = false
-  end
+module RedminePluginAssetPipeline
+  # Register configuration options for library
+  class Configuration
+    alias [] public_send
 
-  def [](value)
-    self.public_send(value)
+    attr_accessor :use_ln
+
+    def initialize
+      @use_ln = false
+    end
   end
 end
