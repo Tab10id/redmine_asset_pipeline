@@ -67,7 +67,7 @@ Our recommendations:
 
 * Move redmine assets to directory `private/assets` (simple create it in root of Redmine)
 * Run `rails generate redmine_pipeline:private_assets_initializer` (that create initializers
-  `09-unpatch-10-patches` and `25-patch_assets_mirror`, that patch Plugin class of Redmine for copy plugin assets to
+  `09-save_original_path_to_asset`, `15-restore_original_path_to_asset` and `28-patch_redmine_plugin_for_sprockets`, that patch Plugin class of Redmine for copy plugin assets to
   private directory and cancel redmine patch that broke sprockets)
 * Fix standard Redmine \*.css files (some paths in css hardcoded to the public root)
 
