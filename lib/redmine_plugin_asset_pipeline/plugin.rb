@@ -43,20 +43,10 @@ module RedminePluginAssetPipeline
     config.to_prepare do
       require_dependency 'application_helper'
 
-      patch = RedminePluginAssetPipeline::Infectors::ApplicationHelper
+      helper_patch = RedminePluginAssetPipeline::Infectors::ApplicationHelper
 
-      unless ApplicationHelper.included_modules.include?(patch)
-        ApplicationHelper.include(patch)
-      end
-    end
-
-    config.before_configuration do
-      require_dependency 'redmine/plugin'
-
-      patch = RedminePluginAssetPipeline::Infectors::Redmine::Plugin
-
-      unless Redmine::Plugin.included_modules.include?(patch)
-        Redmine::Plugin.include(patch)
+      unless ApplicationHelper.included_modules.include?(helper_patch)
+        ApplicationHelper.include(helper_patch)
       end
     end
   end

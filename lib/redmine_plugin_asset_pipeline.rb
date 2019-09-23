@@ -8,17 +8,4 @@ module RedminePluginAssetPipeline
   extend ActiveSupport::Autoload
   autoload :Configuration
   autoload :Infectors
-
-  class << self
-    attr_reader :config
-
-    def configure
-      self.config ||= Configuration.new
-      yield(self.config)
-    end
-
-    private
-
-    attr_writer :config
-  end
 end

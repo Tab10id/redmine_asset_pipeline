@@ -10,11 +10,11 @@ module RedminePluginAssetPipeline
         extend ActiveSupport::Concern
 
         included do
-          alias_method :mirror_assets_to_public, :mirror_assets
           alias_method :mirror_assets, :mirror_assets_to_private
 
           class << self
             cattr_accessor :private_directory_base
+
             self.private_directory_base =
               File.join(Rails.root, 'private', 'plugin_assets')
           end
@@ -32,15 +32,11 @@ module RedminePluginAssetPipeline
             FileUtils.mkdir_p(self.class.private_directory_base)
           end
 
-          if File.exist?(destination)
-            FileUtils.rm_rf(destination)
-          end
+          FileUtils.rm_rf(destination) if File.exist?(destination)
           return unless File.directory?(source)
 
-          if RedminePluginAssetPipeline.config.use_ln
-            if File.exist?(source)
-              FileUtils.ln_s(source, destination)
-            end
+          if RedmineApp::Application.config.assets.compile
+            FileUtils.ln_s(source, destination) if File.exist?(source)
           else
             source_files = Dir[source + '/**/*']
             source_dirs = source_files.select { |d| File.directory?(d) }

@@ -20,13 +20,15 @@ module RedminePluginAssetPipeline
   # end
   class SprocketsProcessor < Sprockets::DirectiveProcessor
     def process_require_redmine_plugins_directive(type, prefix = '')
-      mask =
-        Rails.root.join(
-          Redmine::Plugin.private_directory_base,
-          "*/#{type}/#{prefix}_common_part*"
-        ).expand_path
+      assets_root = Rails.root.join(Redmine::Plugin.private_directory_base)
+      mask = assets_root.join("*/#{type}/#{prefix}_common_part*").expand_path
       Dir.glob(mask).sort.each do |entry|
-        context.require_asset(pathname.dirname.join(entry).expand_path)
+        @required <<
+          resolve(
+            Pathname.new(entry).relative_path_from(assets_root).to_s,
+            accept: @content_type,
+            pipeline: :self
+          )
       end
     end
   end
